@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌳 Gestión de Árbol</title>
+    <style>
+        /* Fondo y cuerpo */
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background: linear-gradient(180deg, #1e1e2f 30%, #2a2b45 100%);
+            color: white;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+    
+        /* Título principal */
+        h1 {
+            background: linear-gradient(90deg, #6c63ff, #48aaff);
+            padding: 20px;
+            margin: 0;
+            font-size: 30px;
+            color: white;
+            text-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        }
+    
+        /* Contenedor de entradas y botones */
+        .input-container {
+            margin: 20px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #292b3d, #1f2133);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            display: inline-block;
+        }
+    
+        /* Entradas y botones */
+        input, button {
+            padding: 12px 20px;
+            font-size: 18px;
+            margin: 10px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+    
+        input {
+            background-color: #1f2133;
+            color: #f3f4f6;
+            border: 2px solid #6c63ff;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+    
+        input:focus {
+            border-color: #48aaff;
+            box-shadow: 0 0 10px #48aaff;
+        }
+    
+        button {
+            background: linear-gradient(135deg, #6c63ff, #4843c4);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+    
+        button:hover {
+            background: linear-gradient(135deg, #4843c4, #48aaff);
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
+        }
+    
+        /* Canvas */
+        canvas {
+            margin-top: 20px;
+            border: 3px solid #48aaff;
+            border-radius: 15px;
+            background: radial-gradient(circle, #1a1b30, #2d2f49);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
+        }
+    
+        /* Contenedor de historial */
+        .log-container {
+            margin: 30px auto;
+            padding: 25px;
+            width: 80%;
+            background: linear-gradient(135deg, #1a1b30, #292b3d);
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+            text-align: left;
+        }
+    
+        .log-container h3 {
+            font-size: 24px;
+            color: #48aaff;
+            text-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+            border-bottom: 2px solid #6c63ff;
+            padding-bottom: 10px;
+        }
+    
+        /* Elementos del historial */
+        .log-item {
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1f2133, #2a2b45);
+            border-radius: 12px;
+            border: 2px solid #6c63ff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+    
+        .log-item:hover {
+            transform: translateY(-3px);
+            background: linear-gradient(135deg, #2a2b45, #3b3d5b);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+        }
+    
+        .log-item p {
+            margin: 10px 0;
+            font-size: 16px;
+            color: #d1d1e0;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+    
+        .log-item img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 15px;
+            border: 3px solid #6c63ff;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+    
+        .log-item img:hover {
+            transform: scale(1.05);
+            border-color: #48aaff;
+        }
+
+        /* Media Query para pantallas pequeñas (teléfonos) */
+@media screen and (max-width: 480px) {
+    h1 {
+        font-size: 22px;
+        padding: 15px;
+    }
+
+    .input-container {
+        width: 90%;
+        padding: 15px;
+    }
+
+    input, button {
+        font-size: 14px;
+        padding: 10px;
+        margin: 5px;
+    }
+
+    canvas {
+        width: 100%;
+        height: auto;
+        margin-top: 15px;
+    }
+
+    .log-container {
+        width: 95%;
+        padding: 15px;
+    }
+
+    .log-item {
+        margin: 10px 0;
+        padding: 10px;
+    }
+
+    .log-item p {
+        font-size: 14px;
+    }
+
+    .log-item img {
+        border: 2px solid #6c63ff;
+        margin-top: 10px;
+    }
+}
+
+/* Media Query para pantallas medianas (tabletas) */
+@media screen and (max-width: 768px) {
+    h1 {
+        font-size: 26px;
+        padding: 18px;
+    }
+
+    .input-container {
+        width: 80%;
+        padding: 20px;
+    }
+
+    input, button {
+        font-size: 16px;
+        padding: 12px;
+    }
+
+    canvas {
+        width: 100%;
+        height: auto;
+        margin-top: 20px;
+    }
+
+    .log-container {
+        width: 90%;
+        padding: 20px;
+    }
+
+    .log-item {
+        margin: 15px 0;
+        padding: 15px;
+    }
+
+    .log-item p {
+        font-size: 15px;
+    }
+
+    .log-item img {
+        margin-top: 12px;
+    }
+}
+
+/* Media Query para pantallas grandes (escritorios pequeños) */
+@media screen and (max-width: 1024px) {
+    h1 {
+        font-size: 28px;
+        padding: 20px;
+    }
+
+    .input-container {
+        width: 70%;
+        padding: 25px;
+    }
+
+    input, button {
+        font-size: 18px;
+        padding: 14px;
+    }
+
+    canvas {
+        width: 90%;
+        height: auto;
+        margin-top: 25px;
+    }
+
+    .log-container {
+        width: 85%;
+        padding: 25px;
+    }
+
+    .log-item {
+        margin: 15px 0;
+        padding: 20px;
+    }
+
+    .log-item p {
+        font-size: 16px;
+    }
+
+    .log-item img {
+        border: 3px solid #6c63ff;
+        margin-top: 15px;
+    }
+}
+
+
+h1 {
+        background: linear-gradient(90deg, #6c63ff, #48aaff);
+        padding: 20px;
+        margin: 0;
+        font-size: 30px;
+        color: white;
+        text-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+        border-radius: 0 0 15px 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    }
+    #welcomeMessage {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #6c63ff, #48aaff);
+    color: white;
+    padding: 30px 40px;
+    border-radius: 20px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    animation: fadeInOut 3s forwards;
+    z-index: 1000;
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    20% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    80% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.2);
+    }
+}
+
+
+#premiumAd {
+    position: fixed;
+    bottom: 10%;
+    right: 10%;
+    background: #292b3d;
+    color: white;
+    padding: 20px 30px;
+    border-radius: 15px;
+    text-align: center;
+    border: 2px solid #48aaff;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.6);
+    z-index: 999;
+    display: none;
+    animation: slideIn 0.5s forwards;
+}
+
+#premiumAd h3 {
+    font-size: 20px;
+    margin: 0 0 10px 0;
+    color: #48aaff;
+}
+
+#premiumAd button {
+    background: linear-gradient(135deg, #6c63ff, #48aaff);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+#premiumAd button:hover {
+    background: linear-gradient(135deg, #48aaff, #6c63ff);
+    transform: scale(1.05);
+}
+
+@keyframes slideIn {
+    0% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+    </style>
+    
+</head>
+<body>
+    <h1>🌳 Gestión de Árbol</h1>
+    <div id="welcomeMessage">¡HOLA! V2.0 DE VIERNES</div>
+
+    <div id="premiumAd">
+        <h3>Adquiere la versión PREMIUM por $500 MX</h3>
+        <p>Funciones exclusivas para gestión avanzada de árboles.</p>
+        <button onclick="closeAd()">Cerrar</button>
+    </div>
+
+    <div id="premiumModal" style="display: none;">
+        <div style="background: linear-gradient(135deg, #292b3d, #1f2133); color: white; padding: 20px; border-radius: 15px; width: 50%; margin: auto; margin-top: 100px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);">
+            <h2 style="color: #48aaff;">¡Acceso Premium Requerido!</h2>
+            <p style="font-size: 18px;">Has alcanzado el límite de 3 eliminaciones.</p>
+            <p>Adquiere la versión <strong>PREMIUM</strong> por $500 MX para desbloquear eliminaciones ilimitadas y más funciones.</p>
+            <button onclick="closePremiumModal()" style="background: #48aaff; border: none; padding: 10px 20px; border-radius: 8px; font-size: 16px; color: white; cursor: pointer; transition: all 0.3s;">
+                Cerrar
+            </button>
+        </div>
+    </div>
+    
+    
+    
+    <div class="input-container">
+        <input type="text" id="deleteField" placeholder="Ingresa nodo a eliminar">
+        <button onclick="deleteNode()">Eliminar Nodo</button>
+        <button onclick="clearSavedImages()">Limpiar Imágenes</button>
+        <button onclick="location.href='index.html'">Volver al Inicio</button>
+    </div>
+    <canvas id="treeCanvas" width="1200" height="800"></canvas>
+
+    <div class="log-container" id="logContainer">
+        <h3>Historial de Eliminaciones</h3>
+    </div>
+    <script>
+        class TreeNode {
+            constructor(value) {
+                this.value = value;
+                this.left = null;
+                this.right = null;
+                this.x = 0;
+                this.y = 0;
+            }
+        }
+    
+        class BinaryTree {
+            constructor() {
+                this.root = null;
+            }
+    
+            deserialize(data) {
+                const nodes = JSON.parse(data);
+                this.root = this._deserializeRec(nodes);
+            }
+    
+            _deserializeRec(nodes) {
+                if (!nodes.length) return null;
+    
+                const value = nodes.shift();
+                if (value === null) return null;
+    
+                const node = new TreeNode(value);
+                node.left = this._deserializeRec(nodes);
+                node.right = this._deserializeRec(nodes);
+    
+                return node;
+            }
+    
+            delete(value) {
+                this.root = this._deleteRec(this.root, value);
+            }
+    
+            _deleteRec(node, value) {
+                if (!node) return null;
+    
+                if (value < node.value) {
+                    node.left = this._deleteRec(node.left, value);
+                } else if (value > node.value) {
+                    node.right = this._deleteRec(node.right, value);
+                } else {
+                    if (!node.left) return node.right;
+                    if (!node.right) return node.left;
+    
+                    const minLargerNode = this._findMin(node.right);
+                    node.value = minLargerNode.value;
+                    node.right = this._deleteRec(node.right, minLargerNode.value);
+                }
+    
+                return node;
+            }
+    
+            _findMin(node) {
+                while (node.left) {
+                    node = node.left;
+                }
+                return node;
+            }
+    
+            traverseInOrder(node, result = []) {
+                if (node) {
+                    this.traverseInOrder(node.left, result);
+                    result.push(node.value);
+                    this.traverseInOrder(node.right, result);
+                }
+                return result;
+            }
+    
+            traversePreOrder(node, result = []) {
+                if (node) {
+                    result.push(node.value);
+                    this.traversePreOrder(node.left, result);
+                    this.traversePreOrder(node.right, result);
+                }
+                return result;
+            }
+    
+            traversePostOrder(node, result = []) {
+                if (node) {
+                    this.traversePostOrder(node.left, result);
+                    this.traversePostOrder(node.right, result);
+                    result.push(node.value);
+                }
+                return result;
+            }
+    
+            traverseAndDraw(ctx, node, x, y, level = 1, parentX = null, parentY = null, isLeft = false) {
+                if (!node) return;
+    
+                const horizontalSpacing = 400 / Math.pow(2, level);
+                const verticalSpacing = 80;
+    
+                if (parentX !== null && parentY !== null) {
+                    ctx.beginPath();
+                    ctx.moveTo(parentX, parentY);
+                    ctx.lineTo(x, y);
+                    ctx.strokeStyle = isLeft ? "blue" : "red";
+                    ctx.stroke();
+                }
+    
+                node.x = x;
+                node.y = y;
+    
+                ctx.beginPath();
+                ctx.arc(x, y, 20, 0, 2 * Math.PI);
+                ctx.fillStyle = "white";
+                ctx.fill();
+                ctx.stroke();
+    
+                ctx.fillStyle = "black";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.font = "16px Arial";
+                ctx.fillText(node.value, x, y);
+    
+                this.traverseAndDraw(ctx, node.left, x - horizontalSpacing, y + verticalSpacing, level + 1, x, y, true);
+                this.traverseAndDraw(ctx, node.right, x + horizontalSpacing, y + verticalSpacing, level + 1, x, y, false);
+            }
+        }
+    
+        const tree = new BinaryTree();
+        const canvas = document.getElementById("treeCanvas");
+        const ctx = canvas.getContext("2d");
+    
+        const logContainer = document.getElementById("logContainer");
+        let deleteCount = 0;
+        const maxDeletes = 3;
+    
+        // Recuperar el árbol desde localStorage
+        const serializedTree = localStorage.getItem("binaryTree");
+        if (serializedTree) {
+            tree.deserialize(serializedTree);
+            updateTree();
+        }
+    
+        function deleteNode() {
+            if (deleteCount >= maxDeletes) {
+                showPremiumModal();
+                return;
+            }
+    
+            const value = document.getElementById("deleteField").value.trim();
+            if (!value) {
+                alert("Por favor, ingresa un valor.");
+                return;
+            }
+    
+            // Eliminar nodo y luego generar imagen
+            tree.delete(isNaN(value) ? value : parseInt(value));
+            updateTree(); // Dibuja el árbol actualizado
+            saveTreeState(value); // Guarda la imagen sin el nodo eliminado
+            document.getElementById("deleteField").value = "";
+    
+            deleteCount++; // Incrementar el conteo de eliminaciones
+        }
+    
+        function updateTree() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            tree.traverseAndDraw(ctx, tree.root, canvas.width / 2, 50);
+        }
+    
+        function saveTreeState(deletedNode) {
+            const imgData = canvas.toDataURL("image/png");
+            const logItem = document.createElement("div");
+            logItem.className = "log-item";
+            logItem.innerHTML = `
+                <p>Nodo eliminado: ${deletedNode}</p>
+                <p><strong>InOrden:</strong> ${tree.traverseInOrder(tree.root).join(", ")}</p>
+                <p><strong>PreOrden:</strong> ${tree.traversePreOrder(tree.root).join(", ")}</p>
+                <p><strong>PostOrden:</strong> ${tree.traversePostOrder(tree.root).join(", ")}</p>
+                <img src="${imgData}" alt="Árbol después de eliminar ${deletedNode}">
+            `;
+            logContainer.appendChild(logItem);
+        }
+    
+        function clearSavedImages() {
+            logContainer.innerHTML = "<h3>Historial de Eliminaciones</h3>";
+        }
+    
+        // Mostrar el anuncio premium
+        function showPremiumModal() {
+            const modal = document.getElementById("premiumModal");
+            modal.style.display = "block";
+        }
+    
+        // Cerrar el anuncio premium
+        function closePremiumModal() {
+            const modal = document.getElementById("premiumModal");
+            modal.style.display = "none";
+        }
+    </script>
+    
+</body>    
+</html>
